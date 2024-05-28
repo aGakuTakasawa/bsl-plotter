@@ -13,6 +13,12 @@ from plotter_controller.srv import marubatu
 
 from control_arm import ControlArm
 
+#　原点座標
+ORIGIN_X = 175
+ORIGIN_Y = 175
+#人マスの大きさ
+MASU_SIZE = 50
+
 #　まる罰ゲームの実装
 
 #path (x, y, pen_up_down, time)
@@ -37,10 +43,10 @@ def create_path(x0, y0, x1, y1, t, n=100):
 
 #丸罰ゲームの罫線の座標を返す
 line_points = [
-    [(100, 150), (250, 150)],
-    [(100, 200), (250, 200)],
-    [(150, 100), (150, 250)],
-    [(200, 100), (200, 250)]
+    [(ORIGIN_X, ORIGIN_Y + MASU_SIZE), (ORIGIN_X + 3 * MASU_SIZE, ORIGIN_Y + MASU_SIZE)],
+    [(ORIGIN_X, ORIGIN_Y + 2 * MASU_SIZE), (ORIGIN_X + 3 * MASU_SIZE, ORIGIN_Y + 2 * MASU_SIZE)],
+    [(ORIGIN_X + MASU_SIZE, ORIGIN_Y), (ORIGIN_X + MASU_SIZE, ORIGIN_Y + 3 * MASU_SIZE)],
+    [(ORIGIN_X + 2 * MASU_SIZE, ORIGIN_Y), (ORIGIN_X + 2 * MASU_SIZE, ORIGIN_Y + 3 * MASU_SIZE)]
 ]
 
 #円のpathを生成する関数
@@ -86,13 +92,11 @@ def callback(req):
     print(x, y, req.marubatu)
     if(x < 0 or x > 2 or y < 0 or y > 2):
         return
-    x -= 1
-    y -= 1
     if req.marubatu:
-        path = target_circle(175 + 50 * x, 175 + 50 * y, 20, 4)
+        path = target_circle(ORIGIN_X + MASU_SIZE / 2.0 + MASU_SIZE * x, ORIGIN_Y + MASU_SIZE / 2.0 + MASU_SIZE * y, 20, 4)
         path_buffer.append(path)
     else:
-        path = target_cross(175 + 50 * x, 175 + 50 * y, 20, 6)
+        path = target_cross(ORIGIN_X + MASU_SIZE / 2.0 + MASU_SIZE * x, ORIGIN_Y + MASU_SIZE / 2.0 + MASU_SIZE * y, 20, 6)
         path_buffer.append(path)
     
 
