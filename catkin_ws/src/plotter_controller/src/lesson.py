@@ -43,9 +43,6 @@ line_points = [
     [(200, 100), (200, 250)]
 ]
 
-# def callback(data):
-#     rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
-
 #円のpathを生成する関数
 def target_circle(x0, y0, r, t, n=100):
     path = []
@@ -76,6 +73,12 @@ def target_cross(x0, y0, r, t, n=100):
 # bool marubatu   true: maru, false: batu
 # int64 x      x座標 0 ~ 2
 # int64 y       y座標 0 ~ 2
+
+masu = [
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0]
+]
 
 def callback(req):
     x = req.x
@@ -108,11 +111,6 @@ def main():
 
     arm = ControlArm(publisher_angles)
 
-    # up pen
-    #arm.up_pen()
-
-    #罫線の描画 
-
     arm.up_pen()
     #1秒待つ
     rospy.sleep(1)
@@ -134,20 +132,12 @@ def main():
                 index = index + 1
             r.sleep()
 
+    # keisen no byouga
     for points in line_points:
         x0, y0 = points[0]
         x1, y1 = points[1]
         path = create_path(x0, y0, x1, y1, 2)
         path_buffer.append(path)
-    
-    # path = target_circle(175, 175, 20, 4)
-    # # write(path)
-    # path_buffer.append(path)
-
-    # path = target_cross(225, 175, 20, 6)
-    # # write(path)
-    # path_buffer.append(path)
-
 
     while not rospy.is_shutdown():
         if path_buffer:
