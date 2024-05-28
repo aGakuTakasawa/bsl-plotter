@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<launch>
+  <node pkg="plotter_controller" type="key_input" name="key_input" launch-prefix="sudo"/>
+</launch>

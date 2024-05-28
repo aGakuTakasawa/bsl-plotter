@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+
+import math
+import numpy as np
+
+import rospy
+import tf2_ros
+import tf_conversions
+import geometry_msgs.msg
+import time
+from sensor_msgs.msg import JointState
+
+from control_arm import ControlArm
+
+
+def target_line(t):
+    # Need to rewrite this place
+
+#    t = math.sin(2.0 * math.pi / 5.0 * t)
+
+#    x = 50 * t + 150
+#    y = 0.05 * (t * 50) * (t * 50) + 150
+
+    x = 70 * np.cos(1.1 * math.pi / 5.0 * t) + 20 * np.cos(4.1 * math.pi / 5.0 * t) + 150
+    y = 70 * np.sin(1.1 * math.pi / 5.0 * t) + 20 * np.sin(4.1 * math.pi / 5.0 * t) + 150
+
+    return x, y
+
+
+def main():
+
+    rospy.init_node('lesson_controller')
+    publisher_angles = rospy.Publisher('joint_state', JointState, queue_size=10)
+
+    rate = 100 #[hz]
+
+    r = rospy.Rate(rate) #[hz] 
+    theta1 = 0 #[rad]
+    theta2 = 0  #[rad]
+    t
+
+        rospy.loginfo(x)
+        r.sleep()
+
+
+if __name__=='__main__':
+    try:
+        main()
+    except rospy.ROSInterruptException:
+        pass
+
