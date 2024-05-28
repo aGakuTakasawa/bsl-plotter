@@ -95,9 +95,20 @@ masu = [
     [0, 0, 0]
 ]
 
+gg_line_points = [
+    [(ORIGIN_X + MASU_SIZE * 0.5, ORIGIN_Y), (ORIGIN_X + MASU_SIZE * 0.5, ORIGIN_Y + MASU_SIZE * 3)],
+    [(ORIGIN_X + MASU_SIZE * 1.5, ORIGIN_Y), (ORIGIN_X + MASU_SIZE * 1.5, ORIGIN_Y + MASU_SIZE * 3)],
+    [(ORIGIN_X + MASU_SIZE * 2.5, ORIGIN_Y), (ORIGIN_X + MASU_SIZE * 2.5, ORIGIN_Y + MASU_SIZE * 3)],
+    [(ORIGIN_X, ORIGIN_Y + MASU_SIZE * 0.5), (ORIGIN_X + MASU_SIZE * 3, ORIGIN_Y + MASU_SIZE * 0.5)],
+    [(ORIGIN_X, ORIGIN_Y + MASU_SIZE * 1.5), (ORIGIN_X + MASU_SIZE * 3, ORIGIN_Y + MASU_SIZE * 1.5)],
+    [(ORIGIN_X, ORIGIN_Y + MASU_SIZE * 2.5), (ORIGIN_X + MASU_SIZE * 3, ORIGIN_Y + MASU_SIZE * 2.5)],
+]
+
 def callback(req):
     x = req.x
     y = req.y
+
+    masu[x][y] = 1 if req.marubatu else 2
 
     if(x < 0 or x > 2 or y < 0 or y > 2):
         return
@@ -107,6 +118,21 @@ def callback(req):
     else:
         path = target_cross(ORIGIN_X + MASU_SIZE / 2.0 + MASU_SIZE * x, ORIGIN_Y + MASU_SIZE / 2.0 + MASU_SIZE * y, (MASU_SIZE - 20) / 2, 6)
         path_buffer.append(path)
+    
+    if masu[x][0] == masu[x][1] and masu[x][0] == masu[x][2] :
+        points = gg_line_points[x]
+        x0, y0 = points[0]
+        x1, y1 = points[1]
+        path = create_path(x0, y0, x1, y1, 2)
+        path_buffer.append(path)
+
+    elif masu[0][y] == masu[1][y] and masu[0][y] == masu[2][y] :
+        points = gg_line_points[y + 3]
+        x0, y0 = points[0]
+        x1, y1 = points[1]
+        path = create_path(x0, y0, x1, y1, 2)
+        path_buffer.append(path)
+
 
     return marubatuResponse(success = True)
     
@@ -114,7 +140,7 @@ def callback(req):
 
 def main():
 
-    rospy.init_node('lesson_controller')
+    rospy.init_node('marubatu_controller')
     publisher_angles = rospy.Publisher('joint_state', JointState, queue_size=10)
     #marubatu serviceからの情報を受け取る
     service = rospy.Service('marubatu_server', marubatu, callback)
