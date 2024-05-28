@@ -14,9 +14,9 @@ from control_arm import ControlArm
 
 
 def target_line(t):
-    # Need to rewrite this place
-    x = 200
-    y = 200
+
+    x = 50*np.sin((2*np.pi/5)*t) + 150
+    y = 50*np.cos((2*np.pi/5)*t) + 150
 
     return x, y
 
