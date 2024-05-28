@@ -128,7 +128,7 @@ class ControlArm:
 
     
     def up_pen(self):
-        self.update_angles(self.theta1, self.theta2, -20)
+        self.update_angles(self.theta1, self.theta2, -40)
 
     def down_pen(self):
         self.update_angles(self.theta1, self.theta2, 0)

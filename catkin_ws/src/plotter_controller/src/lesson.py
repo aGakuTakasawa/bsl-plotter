@@ -14,8 +14,8 @@ from plotter_controller.srv import marubatu
 from control_arm import ControlArm
 
 #　原点座標
-ORIGIN_X = 175
-ORIGIN_Y = 175
+ORIGIN_X = 100
+ORIGIN_Y = 100
 #人マスの大きさ
 MASU_SIZE = 50
 
@@ -52,12 +52,18 @@ line_points = [
 #円のpathを生成する関数
 def target_circle(x0, y0, r, t, n=100):
     path = []
+
+    x = x0 + r * math.cos(2 * math.pi * 0.0)
+    y = y0 + r * math.sin(2 * math.pi * 0.0)
+    path.append((x, y, 0, 0.0))
+    path.append((x, y, 0, 1.0))
+    
     for i in range(n):
         x = x0 + r * math.cos(2 * math.pi * i / n)
         y = y0 + r * math.sin(2 * math.pi * i / n)
         path.append((x, y, 1, 2.0 + i * t / n))
-    path.append((x0 + r, y0, 0, t + 1.0))
-    path.append((x0 + r, y0, 0, t + 2.0))
+    path.append((x0 + r, y0, 0, 2.0 + t + 1.0))
+    path.append((x0 + r, y0, 0, 2.0 + t + 2.0))
     return path
 
 #バツのpathを生成する関数
@@ -71,8 +77,11 @@ def target_cross(x0, y0, r, t, n=100):
     path_tmp = create_path(points[1][0][0], points[1][0][1], points[1][1][0], points[1][1][1], t / 2, n)
     #path_tmpのtimeを+ t/2する
     for i in range(len(path_tmp)):
-        path_tmp[i] = (path_tmp[i][0], path_tmp[i][1], path_tmp[i][2], path_tmp[i][3] + t / 2)
+        path_tmp[i] = (path_tmp[i][0], path_tmp[i][1], path_tmp[i][2], path[-1][3] + path_tmp[i][3] + 1.0)
     path = path + path_tmp
+
+    print(path)
+
     return path
 
 #### service内容
@@ -89,7 +98,6 @@ masu = [
 def callback(req):
     x = req.x
     y = req.y
-    print(x, y, req.marubatu)
     if(x < 0 or x > 2 or y < 0 or y > 2):
         return
     if req.marubatu:
@@ -106,7 +114,7 @@ def main():
     rospy.init_node('lesson_controller')
     publisher_angles = rospy.Publisher('joint_state', JointState, queue_size=10)
     #marubatu serviceからの情報を受け取る
-    service = rospy.Service('marubatu', marubatu, callback)
+    service = rospy.Service('marubatu_server', marubatu, callback)
 
     r = rospy.Rate(rate) #[hz] 
     theta1 = 0 #[rad]
@@ -130,7 +138,6 @@ def main():
                 arm.down_pen()
             theta1, theta2 = arm.solve_ik_deg(x, y)
             arm.update_angles(theta1, theta2)
-            print(x, y, z, target_time, theta1, theta2)
             time = time + 1 / rate
             if time >= target_time:
                 index = index + 1
