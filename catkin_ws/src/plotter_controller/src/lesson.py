@@ -9,15 +9,15 @@ import tf_conversions
 import geometry_msgs.msg
 import time
 from sensor_msgs.msg import JointState
-from plotter_controller.srv import marubatu
+from plotter_controller.srv import marubatu, marubatuResponse
 
 from control_arm import ControlArm
 
 #　原点座標
-ORIGIN_X = 80
-ORIGIN_Y = 80
+ORIGIN_X = 100
+ORIGIN_Y = 100
 #人マスの大きさ
-MASU_SIZE = 60
+MASU_SIZE = 50
 
 #　まる罰ゲームの実装
 
@@ -98,6 +98,7 @@ masu = [
 def callback(req):
     x = req.x
     y = req.y
+
     if(x < 0 or x > 2 or y < 0 or y > 2):
         return
     if req.marubatu:
@@ -106,6 +107,8 @@ def callback(req):
     else:
         path = target_cross(ORIGIN_X + MASU_SIZE / 2.0 + MASU_SIZE * x, ORIGIN_Y + MASU_SIZE / 2.0 + MASU_SIZE * y, (MASU_SIZE - 20) / 2, 6)
         path_buffer.append(path)
+
+    return marubatuResponse(success = True)
     
 
 
