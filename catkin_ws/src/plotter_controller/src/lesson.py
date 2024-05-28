@@ -48,14 +48,12 @@ line_points = [
 #円のpathを生成する関数
 def target_circle(x0, y0, r, t, n=100):
     path = []
-    path.append((x0, y0, 0, 1.0))
-    path.append((x0, y0, 1, 2.0))
     for i in range(n):
         x = x0 + r * math.cos(2 * math.pi * i / n)
         y = y0 + r * math.sin(2 * math.pi * i / n)
         path.append((x, y, 1, 2.0 + i * t / n))
-    path.append((x0 + r, y0, 0, 2.0 + t + 1.0))
-    path.append((x0 + r, y0, 0, 2.0 + t + 2.0))
+    path.append((x0 + r, y0, 0, t + 1.0))
+    path.append((x0 + r, y0, 0, t + 2.0))
     return path
 
 #バツのpathを生成する関数
@@ -66,7 +64,11 @@ def target_cross(x0, y0, r, t, n=100):
     ]
 
     path = create_path(points[0][0][0], points[0][0][1], points[0][1][0], points[0][1][1], t / 2, n)
-    path = path + create_path(points[1][0][0], points[1][0][1], points[1][1][0], points[1][1][1], t / 2, n)
+    path_tmp = create_path(points[1][0][0], points[1][0][1], points[1][1][0], points[1][1][1], t / 2, n)
+    #path_tmpのtimeを+ t/2する
+    for i in range(len(path_tmp)):
+        path_tmp[i] = (path_tmp[i][0], path_tmp[i][1], path_tmp[i][2], path_tmp[i][3] + t / 2)
+    path = path + path_tmp
     return path
 
 
@@ -114,14 +116,8 @@ def main():
 
     for points in line_points:
         x0, y0 = points[0]
-        # theta1, theta2 = arm.solve_ik_deg(x0, y0)
-        # arm.update_angles(theta1, theta2)
-        # rospy.sleep(1)
-        # arm.down_pen()
-        # rospy.sleep(1)
         x1, y1 = points[1]
         path = create_path(x0, y0, x1, y1, 2)
-        # write(path)
         path_buffer.append(path)
     
     path = target_circle(175, 175, 20, 4)
@@ -134,21 +130,6 @@ def main():
 
 
     while not rospy.is_shutdown():
-
-        # if len(path_buffer) > path_index:
-        #     x, y = path_buffer[path_index]
-
-        #     print(x, y)
-        #     theta1, theta2 = arm.solve_ik_deg(x, y)
-
-        #     arm.update_angles(theta1, theta2)
-
-        #     path_index = path_index + 1
-        #     if path_index >= len(path_buffer):
-        #         path_index = 0
-        #         path_buffer = []
-
-        #     rospy.loginfo(x)
         if path_buffer:
             path = path_buffer.pop(0)
             write(path)
